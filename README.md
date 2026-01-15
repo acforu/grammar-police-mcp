@@ -16,11 +16,17 @@ The actual grammar checking is performed by the LLM client (e.g., Claude Code), 
 
 ## Installation
 
-### Option 1: Clone from GitHub
+### Option 1: Install from npm (Recommended)
+
+```bash
+npm install -g grammar-police-mcp
+```
+
+### Option 2: Clone from GitHub
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/grammar-police-mcp.git
+git clone https://github.com/AImissq/grammar-police-mcp.git
 cd grammar-police-mcp
 
 # Install dependencies
@@ -29,12 +35,6 @@ npm install
 # Build the project
 npm run build
 ```
-
-### Option 2: Download Release
-
-1. Download the latest release from the [Releases](https://github.com/YOUR_USERNAME/grammar-police-mcp/releases) page
-2. Extract the archive
-3. Run `npm install && npm run build`
 
 ## Configuration
 
@@ -45,6 +45,21 @@ npm run build
    - **macOS/Linux:** `~/.claude/claude_desktop_config.json`
 
 2. Add the grammar-police server to the `mcpServers` section:
+
+**If installed via npm (Option 1):**
+
+```json
+{
+  "mcpServers": {
+    "grammar-police": {
+      "command": "npx",
+      "args": ["grammar-police-mcp"]
+    }
+  }
+}
+```
+
+**If cloned from GitHub (Option 2):**
 
 ```json
 {
@@ -57,7 +72,7 @@ npm run build
 }
 ```
 
-> **Note:** Replace `C:/path/to/grammar-police-mcp` with the actual path where you cloned/extracted the project.
+> **Note:** If using the GitHub clone option, replace `C:/path/to/grammar-police-mcp` with the actual path where you cloned the project.
 
 3. Restart Claude Code to load the new MCP server
 
