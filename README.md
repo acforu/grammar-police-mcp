@@ -48,31 +48,59 @@ npm run build
 
 **If installed via npm (Option 1):**
 
+*macOS/Linux:*
 ```json
 {
   "mcpServers": {
     "grammar-police": {
       "command": "npx",
-      "args": ["grammar-police-mcp"]
+      "args": ["-y", "grammar-police-mcp"]
     }
   }
 }
 ```
 
+*Windows:*
+```json
+{
+  "mcpServers": {
+    "grammar-police": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "grammar-police-mcp"]
+    }
+  }
+}
+```
+
+> **Note:** Windows requires the `cmd /c` wrapper because it cannot directly invoke Node.js scripts without a shell interpreter. The `-y` flag auto-confirms npx package installation.
+
 **If cloned from GitHub (Option 2):**
 
+*macOS/Linux:*
 ```json
 {
   "mcpServers": {
     "grammar-police": {
       "command": "node",
-      "args": ["C:/path/to/grammar-police-mcp/dist/index.js"]
+      "args": ["/path/to/grammar-police-mcp/dist/index.js"]
     }
   }
 }
 ```
 
-> **Note:** If using the GitHub clone option, replace `C:/path/to/grammar-police-mcp` with the actual path where you cloned the project.
+*Windows:*
+```json
+{
+  "mcpServers": {
+    "grammar-police": {
+      "command": "node",
+      "args": ["C:\\path\\to\\grammar-police-mcp\\dist\\index.js"]
+    }
+  }
+}
+```
+
+> **Note:** Replace the path with the actual location where you cloned the project. Use forward slashes (`/`) on macOS/Linux and backslashes (`\\`) on Windows.
 
 3. Restart Claude Code to load the new MCP server
 
