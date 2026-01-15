@@ -1,0 +1,32 @@
+name: Publish to NPM
+
+# 触发条件：当你创建并发布一个新的 Release 时触发
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 拉取代码
+      - uses: actions/checkout@v4
+
+      # 2. 设置 Node.js 环境
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          # 这里告诉 GitHub 我们要连接的是 npm 官方源
+          registry-url: "https://registry.npmjs.org"
+
+      # 3. 安装依赖 (npm ci 比 npm install 更适合自动化环境)
+      - run: npm ci
+
+      # 4. 构建 TypeScript (确保你有 build 脚本)
+      - run: npm run build
+
+      # 5. 发布到 NPM
+      - run: npm publish
+        env:
+          # 这里会自动读取你在第二步设置的 Secret
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
