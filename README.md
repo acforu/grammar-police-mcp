@@ -1,32 +1,40 @@
-# Grammar Police MCP Server
+# Grammar Police MCP Server 👮‍♂️✍️
 
-An MCP (Model Context Protocol) server that provides grammar checking capabilities to MCP-compatible clients like Claude Code.
+An MCP (Model Context Protocol) server that provides automated grammar checking capabilities to MCP-compatible clients like Claude Desktop and Claude Code.
 
-## How It Works
+## 📖 How It Works
 
-This server exposes a `check_grammar` tool that accepts text input. The tool returns the text to the client along with instructions (in the tool description) for how to analyze and correct grammar errors.
+This server exposes a `check_grammar` tool. The workflow is designed as a "middleware" style interception:
+1.  You configure Claude to send your raw input to this tool **first**.
+2.  The tool returns your text along with correction instructions.
+3.  Claude (the LLM) performs the actual correction based on the tool's output before answering your technical question.
 
-The actual grammar checking is performed by the LLM client (e.g., Claude Code), not the server itself. This design keeps the server lightweight while leveraging the LLM's language understanding capabilities.
+This design keeps the server lightweight while leveraging the LLM's full language understanding capabilities.
 
-## Prerequisites
+## ✅ Prerequisites
 
 - [Node.js](https://nodejs.org/) (v18 or higher)
-- npm (comes with Node.js)
-- [Claude Code](https://claude.ai/download) CLI tool
+- npm (usually comes with Node.js)
+- **One of the following clients:**
+    - [Claude Desktop App](https://claude.ai/download) (GUI)
+    - [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview) (CLI)
 
-## Installation
+## 📦 Installation
 
 ### Option 1: Install from npm (Recommended)
 
+No manual download required. You can run it directly via `npx`.
+
 ```bash
 npm install -g grammar-police-mcp
+
 ```
 
-### Option 2: Clone from GitHub
+### Option 2: Clone from GitHub (For Development)
 
 ```bash
 # Clone the repository
-git clone https://github.com/AImissq/grammar-police-mcp.git
+git clone [https://github.com/acforu/grammar-police-mcp.git](https://github.com/acforu/grammar-police-mcp.git)
 cd grammar-police-mcp
 
 # Install dependencies
@@ -34,25 +42,26 @@ npm install
 
 # Build the project
 npm run build
+
 ```
 
-## Configuration
+## ⚙️ Configuration
 
-> **Important:** Claude Desktop (GUI) and Claude Code (CLI) use **different config files**:
-> - **Claude Desktop (GUI):** `%APPDATA%\Claude\claude_desktop_config.json` (Windows) or `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
-> - **Claude Code (CLI):** `%USERPROFILE%\.claude.json` (Windows) or `~/.claude.json` (macOS/Linux)
+> **⚠️ Important:** Claude Desktop (GUI) and Claude Code (CLI) use **different config files**. Please follow the section matching your tool.
 
-### Claude Desktop Setup
+### 🖥️ For Claude Desktop (GUI)
 
-1. Open your Claude Desktop MCP settings file:
-   - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
-   - **macOS/Linux:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Config File Location:**
 
-2. Add the grammar-police server to the `mcpServers` section:
+* **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+* **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 
-**If installed via npm (Option 1):**
+Add `grammar-police` to the `mcpServers` object.
 
-*macOS/Linux:*
+#### If using npm (Option 1):
+
+**macOS:**
+
 ```json
 {
   "mcpServers": {
@@ -62,9 +71,11 @@ npm run build
     }
   }
 }
+
 ```
 
-*Windows:*
+**Windows:**
+
 ```json
 {
   "mcpServers": {
@@ -74,99 +85,96 @@ npm run build
     }
   }
 }
+
 ```
 
-> **Note:** Windows requires the `cmd /c` wrapper because it cannot directly invoke Node.js scripts without a shell interpreter. The `-y` flag auto-confirms npx package installation.
+*(Note: On Windows, `cmd /c` is required to invoke `npx` correctly.)*
 
-**If cloned from GitHub (Option 2):**
+#### If using Source Code (Option 2):
 
-*macOS/Linux:*
+**macOS:**
+
 ```json
 {
   "mcpServers": {
     "grammar-police": {
       "command": "node",
-      "args": ["/path/to/grammar-police-mcp/dist/index.js"]
+      "args": ["/absolute/path/to/grammar-police-mcp/build/index.js"]
     }
   }
 }
+
 ```
 
-*Windows:*
+**Windows:**
+
 ```json
 {
   "mcpServers": {
     "grammar-police": {
       "command": "node",
-      "args": ["C:\\path\\to\\grammar-police-mcp\\dist\\index.js"]
+      "args": ["C:\\absolute\\path\\to\\grammar-police-mcp\\build\\index.js"]
     }
   }
 }
+
 ```
 
-> **Note:** Replace the path with the actual location where you cloned the project. Use forward slashes (`/`) on macOS/Linux and backslashes (`\\`) on Windows.
+*(Note: Replace paths with your actual project location. Ensure your build output folder is `build`.)*
 
-3. Restart Claude Desktop to load the new MCP server
+---
 
-### Claude Code Setup (CLI)
+### ⌨️ For Claude Code (CLI)
 
-1. Open your Claude Code MCP settings file:
-   - **Windows:** `%USERPROFILE%\.claude.json`
-   - **macOS/Linux:** `~/.claude.json`
+**Config File Location:**
 
-2. Add the grammar-police server to the `mcpServers` section (same JSON format as above)
+* **Windows:** `%USERPROFILE%\.claude.json`
+* **macOS/Linux:** `~/.claude.json`
+* *Or configure per-project in your project's `.claude.json*`
 
-3. Restart Claude Code to load the new MCP server
+Add the server configuration using the same JSON format as the Desktop version above.
 
-### Verify Installation
+## 🚀 Usage
 
-After restarting Claude Code, run `/mcp` to check if the grammar-police server is connected.
+Since this tool is passive (it doesn't fix things unless you ask it to), you must instruct Claude to use it on every message.
 
-## Usage
+### Method A: Claude Desktop (Project Instructions)
 
-Once configured, Claude Code will automatically have access to the `check_grammar` tool. You can instruct Claude to check grammar by configuring your `CLAUDE.md` file to call the tool on user input.
+1. Open your Project in Claude.
+2. Click **Project Settings** (or Edit).
+3. Add the following to **Project Instructions** (System Prompt):
 
-### Example CLAUDE.md Configuration
+> **GLOBAL INSTRUCTION:**
+> You have access to a tool named `grammar-police`. For every user message, you MUST first run the `check_grammar` tool on the raw input to check for errors. Display the corrections if any, then proceed to answer the user's request.
+
+### Method B: Claude Code (CLAUDE.md)
+
+Create or edit the `CLAUDE.md` file in your project root:
 
 ```markdown
-You have access to a tool named `grammar-police`. Call the `check_grammar` tool with user input to check for grammar errors before responding.
+## Tool Usage
+You have access to a tool named `grammar-police`. Call the `check_grammar` tool with the user's raw input to check for English grammar errors before generating your response.
+
 ```
 
-### Running Standalone (Development)
+### Verify It Works
 
-```bash
-npm start
-```
+Restart Claude. Type a message with intentional errors:
 
-## Tool: check_grammar
+> "i write code good."
 
-**Input:**
-- `text` (string): The text to check for grammar errors
+Claude should call the tool and respond with a correction before answering.
 
-**Output:**
-- The input text, returned to the client for grammar analysis
+## 🛠️ Development
 
-**Expected Client Response Format:**
-```
-"original" -> "corrected"
-Corrected: "full corrected sentence"
-```
+* `npm run build`: Compile TypeScript to JavaScript (outputs to `/build`)
+* `npm start`: Run the compiled server
+* `npm run dev`: Watch mode for development
 
-Or if no errors: `No grammar issues.`
-
-**Ignored:** Capitalization, punctuation, technical terms/variable names, error/warning logs.
-
-## Scripts
-
-- `npm run build` - Compile TypeScript to JavaScript
-- `npm start` - Run the compiled server
-- `npm run dev` - Watch mode for development
-
-## Dependencies
-
-- `@modelcontextprotocol/sdk` - MCP server SDK
-- `zod` - Schema validation
-
-## License
+## 📄 License
 
 MIT
+
+```
+
+```
