@@ -38,11 +38,15 @@ npm run build
 
 ## Configuration
 
-### Claude Code Setup
+> **Important:** Claude Desktop (GUI) and Claude Code (CLI) use **different config files**:
+> - **Claude Desktop (GUI):** `%APPDATA%\Claude\claude_desktop_config.json` (Windows) or `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
+> - **Claude Code (CLI):** `%USERPROFILE%\.claude.json` (Windows) or `~/.claude.json` (macOS/Linux)
 
-1. Open your Claude Code MCP settings file:
-   - **Windows:** `%USERPROFILE%\.claude\claude_desktop_config.json`
-   - **macOS/Linux:** `~/.claude/claude_desktop_config.json`
+### Claude Desktop Setup
+
+1. Open your Claude Desktop MCP settings file:
+   - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+   - **macOS/Linux:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 
 2. Add the grammar-police server to the `mcpServers` section:
 
@@ -101,6 +105,16 @@ npm run build
 ```
 
 > **Note:** Replace the path with the actual location where you cloned the project. Use forward slashes (`/`) on macOS/Linux and backslashes (`\\`) on Windows.
+
+3. Restart Claude Desktop to load the new MCP server
+
+### Claude Code Setup (CLI)
+
+1. Open your Claude Code MCP settings file:
+   - **Windows:** `%USERPROFILE%\.claude.json`
+   - **macOS/Linux:** `~/.claude.json`
+
+2. Add the grammar-police server to the `mcpServers` section (same JSON format as above)
 
 3. Restart Claude Code to load the new MCP server
 
